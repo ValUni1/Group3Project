@@ -8,7 +8,7 @@ def hello_world():  # put application's code here
     return 'Hello World!'
 
 @app.route('/hey')
-def hello_world():  # put application's code here
+def hello_world2():  # put application's code here
     return 'bye!'
 
 
