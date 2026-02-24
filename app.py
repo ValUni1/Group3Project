@@ -9,7 +9,7 @@ def hello_world():  # put application's code here
 
 @app.route('/hey')
 def hello_world():  # put application's code here
-    return 'Heyyy!'
+    return 'bye!'
 
 
 if __name__ == '__main__':
