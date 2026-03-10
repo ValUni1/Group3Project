@@ -54,6 +54,22 @@ def author_books():
 def health():
     return jsonify({"status": "Ok"}), 200
 
+@app.route('/ready')
+def ready():
+    try:
+        with get.conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1;")
+                cur.fetchone()
+        return jsonify({"Status": "Ready"}), 200
+
+    except Exception as e:
+        return jsonify({
+            'Status': 'Unready',
+            'Error': str(e)
+        }), 500
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
