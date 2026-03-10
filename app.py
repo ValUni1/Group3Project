@@ -27,29 +27,21 @@ def get_book_by_author(author):
             return {"author": author, "error": data}
         books = []
         for book in data.get("docs", []):
-            books.append({'title':book.get('title'),'first published':book.get('first_publish_year')})
+            books.append({'title':book.get('title'),'year':book.get('first_publish_year')})
         return { "author": author,"books": books }
     except requests.RequestException as e:
         return {"author": author, "error": str(e)}
 
 @app.route('/')
-def home():  # put application's code here
-    return 'This API is running! Add /search?t=harry+potter to the URL to test'
-
-
-
-@app.route('/search')
-def search():
-    title=request.args.get('t')
-    if not title:
-        return {'error': 'No title provided'}, 400
-
-    url = f"https://openlibrary.org/search.json?title={title}"
-    response = requests.get(url)
-    return response.json(), response.status_code
-
-@app.route('/test')
-def test():
+def home():
+    try:
+        authors = get_authors()
+        results = [get_book_by_author(author) for author in authors]
+        return render_template("index.html", results=results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+@app.route('/author_books')
+def author_books():
     try:
         authors = get_authors()
         results = [get_book_by_author(a) for a in authors]
