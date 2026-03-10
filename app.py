@@ -28,6 +28,7 @@ def get_book_by_author(author):
         books = []
         for book in data.get("docs", []):
             books.append({'title':book.get('title'),'year':book.get('first_publish_year')})
+            books.sort(key=lambda x: x['year']) #order by year
         return { "author": author,"books": books }
     except requests.RequestException as e:
         return {"author": author, "error": str(e)}
