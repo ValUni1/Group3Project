@@ -68,7 +68,7 @@ def ready():
             with conn.cursor() as cur:
                 cur.execute("SELECT 1;")
                 cur.fetchone()
-        return jsonify({"status": "Ready"}), 200
+        return jsonify({"Status": "Ready"}), 200
 
     except Exception as e:
         return jsonify({
