@@ -10,6 +10,10 @@ API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OPENLIBRARY_URL = "https://openlibrary.org/search.json"
 
+# DB connection helper
+def get_conn():
+    return psycopg2.connect(DATABASE_URL, sslmode="require")
+
 #DB
 def get_authors():
     with psycopg2.connect(DATABASE_URL, sslmode="require") as conn:
@@ -57,7 +61,7 @@ def health():
 @app.route('/ready')
 def ready():
     try:
-        with get.conn() as conn:
+        with get_conn() as conn:
             with conn.cursor() as cur:
                 cur.execute("SELECT 1;")
                 cur.fetchone()
