@@ -1,10 +1,11 @@
 import os
 import requests
 import psycopg2
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify,flash, redirect, url_for
 from dotenv import load_dotenv
 
 app = Flask(__name__)
+app.secret_key = "wjksbdflbdgksdg324"
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -16,11 +17,21 @@ def get_conn():
 
 #DB
 def get_authors():
-    with psycopg2.connect(DATABASE_URL, sslmode="require") as conn:
+    with get_conn() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT name FROM authors;")
             rows = cur.fetchall()
     return [r[0] for r in rows]
+#add author
+def add_author(author):
+    with get_conn() as conn:
+        try:
+            with conn.cursor() as cur:
+                cur.execute("INSERT INTO authors (name) VALUES (%s);", (author,))
+                conn.commit()
+        except Exception as e:
+            str(e)
+
 
 #API
 def get_book_by_author(author):
@@ -38,13 +49,32 @@ def get_book_by_author(author):
         return {"author": author, "error": str(e)}
 
 @app.route('/')
-def home():
+def dashboard():
     try:
         authors = get_authors()
-        results = [get_book_by_author(author) for author in authors]
-        return render_template("index.html", results=results)
+        selected_author = request.args.get('author')
+        results = get_book_by_author(selected_author) if selected_author else None
+        return render_template("index.html", authors=authors, results=results)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+@app.route('/add', methods=['POST'])
+def add():
+    try:
+        name = request.form.get('name')
+        authors = get_authors()
+        if name in authors:
+            flash(f"Error author {name} already exists")
+            return redirect(url_for('dashboard'))
+        if not name:
+            flash(f"Author name cannot be empty")
+            return redirect(url_for("dashboard"))
+        add_author(name)
+        flash(f"Author {name} has been added")
+        return redirect(url_for("dashboard"))
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/author_books')
 def author_books():
     try:
