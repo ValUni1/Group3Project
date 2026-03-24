@@ -5,11 +5,25 @@
     <title>Title</title>
 </head>
 <body>
-{%for result in results%}
-{{result.author}}
-    {% if result.books%}
+<div class="flashed">
+    {% for flash in get_flashed_messages() %}
+        <div class="alert">{{flash}}</div>
+    {% endfor %}
+</div>
+
+<form method="GET">
+    <label>Select Author:</label><br>
+    <select name="author" id="authors" onchange="this.form.submit()">
+        <option value="">Choose an author</option>
+        {% for author in authors %}
+        <option value="{{author}}" {% if author == selected %}selected{% endif %}> {{author}}</option>
+        {% endfor %}
+    </select>
+</form>
+    {% if results %}
+    <h3>{{results.author}}</h3>
     <ul>
-        {% for book in result.books %}
+        {% for book in results.books %}
         <li>
             {{book.title}}
             {{book.year}}
@@ -20,6 +34,14 @@
 {% else %}
 <p>No books found</p>
 {% endif %}
-{%endfor%}
+<br>
+<br>
+<h3>Add a new author:</h3>
+<form method="POST" action="/add">
+    <label>Author Full Name:</label><br>
+    <input type="text" name="name" placeholder="Ex. Agatha Christie"><br>
+    <br><input type="submit" value="Submit">
+
+</form>
 </body>
 </html>
