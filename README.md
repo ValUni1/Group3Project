@@ -27,7 +27,7 @@ Create a `.env` file with:
 ### DockerFile
 - Dockerfile instructions in Dockerfile
 
-### Run Commands
+### Make/Run Commands
 The app will be available through Render URL
 But you can run with docker too
 
