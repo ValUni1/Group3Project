@@ -2,3 +2,6 @@ flask
 psycopg2-binary
 requests
 python-dotenv
+pytest
+retry-reloaded==0.0.8
+

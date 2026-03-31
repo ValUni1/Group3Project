@@ -86,7 +86,7 @@ def author_books():
 
 @app.route('/health')
 def health():
-    return jsonify({"status": "Ok"}), 200
+    return jsonify({"Status": "OK"}), 200
 
 @app.route('/ready')
 def ready():
