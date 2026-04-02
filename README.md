@@ -1,7 +1,7 @@
 ## Application Description:
 This Flask application that allows users to
 1) Add authors to a Supabase Database
-2) Retrieve the first seven books published by an author using the Library API.
+2) Retrieve the first seven books published by an author using the Open Library API.
 3) View a author and their associated books by clicking on the author name in the dropdown.
 This application is containerised using Docker and deployed via Render.
 
