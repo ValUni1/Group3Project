@@ -2,6 +2,8 @@ import os
 import requests
 import psycopg2
 import time
+import retry_reloaded
+from retry_reloaded import retry ,FixedBackOff
 from flask import Flask, render_template, request, jsonify,flash, redirect, url_for
 from dotenv import load_dotenv
 
