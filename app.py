@@ -12,8 +12,18 @@ app.secret_key = "wjksbdflbdgksdg324"
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
-OPENLIBRARY_URL = os.getenv("API")
+OPENLIBRARY_URL = "https://openlibrary.org/search.json"
 START_TIME = time.time()
+
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_API():
+    response = requests.get(OPENLIBRARY_URL)
+    response.raise_for_status()
+    return response.json()
+
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_database():
+    conn = get_conn()
 
 # DB connection helper
 def get_conn():
@@ -34,7 +44,7 @@ def add_author(author):
                 cur.execute("INSERT INTO authors (name) VALUES (%s);", (author,))
                 conn.commit()
         except Exception as e:
-            print(str(e))
+            str(e)
 
 
 #API
