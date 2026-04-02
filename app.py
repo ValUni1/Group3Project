@@ -1,6 +1,8 @@
 import os
 import requests
 import psycopg2
+import retry_reloaded
+from retry_reloaded import retry, FixedBackOff
 from flask import Flask, render_template, request, jsonify,flash, redirect, url_for
 from dotenv import load_dotenv
 
@@ -10,6 +12,16 @@ load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
 OPENLIBRARY_URL = "https://openlibrary.org/search.json"
+
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_API():
+    response = requests.get(OPENLIBRARY_URL)
+    response.raise_for_status()
+    return response.json()
+
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_database():
+    conn = get_conn()
 
 # DB connection helper
 def get_conn():
