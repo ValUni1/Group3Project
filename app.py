@@ -43,8 +43,9 @@ def get_book_by_author(author):
         books = []
         for book in data.get("docs", []):
             books.append({'title':book.get('title'),'year':book.get('first_publish_year')})
-            books.sort(key=lambda x: x['year']) #order by year
+        books.sort(key=lambda x: x['year'] if x['year'] is not None else 0)  # order by year
         return { "author": author,"books": books }
+
     except requests.RequestException as e:
         return {"author": author, "error": str(e)}
 
@@ -56,6 +57,7 @@ def dashboard():
         results = get_book_by_author(selected_author) if selected_author else None
         return render_template("index.html", authors=authors, results=results, selected=selected_author)
     except Exception as e:
+        print("ERROR", e)
         return jsonify({"error": str(e)}), 500
 
 @app.route('/add', methods=['POST'])
