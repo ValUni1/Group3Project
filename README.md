@@ -47,7 +47,7 @@ POST /add:
 - Requires form data: name
 
 GET /author_books
-- Returns al authors with their books
+- Returns the first seven books for the selected author
 
 GET /health
 - Health check endpoint
