@@ -51,7 +51,7 @@ GET /author_books
 
 GET /health
 - Health check endpoint
-- Returns : {"status": "Ok"}
+- Returns : {"Status": "OK"}
 
 GET /ready:
 - Checks database connectivity
