@@ -10,7 +10,7 @@ app.secret_key = "wjksbdflbdgksdg324"
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
-OPENLIBRARY_URL = os.getenv("API")
+OPENLIBRARY_URL = "https://openlibrary.org/search.json"
 START_TIME = time.time()
 
 # DB connection helper
@@ -32,13 +32,13 @@ def add_author(author):
                 cur.execute("INSERT INTO authors (name) VALUES (%s);", (author,))
                 conn.commit()
         except Exception as e:
-            print(str(e))
+            str(e)
 
 
 #API
 def get_book_by_author(author):
     try:
-        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=5)
+        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=25)
         data = r.json()
         if r.status_code != 200:
             return {"author": author, "error": data}
