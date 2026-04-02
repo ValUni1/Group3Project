@@ -6,7 +6,7 @@ This Flask application that allows users to
 This application is containerised using Docker and deployed via Render.
 
 ### Github repository URL:
-
+https://github.com/ValUni1/Group3Project.git
 
 ### Github Zipped repository:
 
