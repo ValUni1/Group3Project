@@ -1,8 +1,7 @@
 import os
 import requests
 import psycopg2
-import retry_reloaded
-from retry_reloaded import retry, FixedBackOff
+import time
 from flask import Flask, render_template, request, jsonify,flash, redirect, url_for
 from dotenv import load_dotenv
 
@@ -11,7 +10,8 @@ app.secret_key = "wjksbdflbdgksdg324"
 load_dotenv()
 API_KEY = os.getenv("API_KEY")
 DATABASE_URL = os.getenv("DATABASE_URL")
-OPENLIBRARY_URL = "https://openlibrary.org/search.json"
+OPENLIBRARY_URL = os.getenv("API")
+START_TIME = time.time()
 
 @retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
 def retry_API():
@@ -42,21 +42,22 @@ def add_author(author):
                 cur.execute("INSERT INTO authors (name) VALUES (%s);", (author,))
                 conn.commit()
         except Exception as e:
-            str(e)
+            print(str(e))
 
 
 #API
 def get_book_by_author(author):
     try:
-        r= requests.get(OPENLIBRARY_URL,params={"author":author, "appid":API_KEY, "limit":8}, timeout=5)
+        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=5)
         data = r.json()
         if r.status_code != 200:
             return {"author": author, "error": data}
         books = []
         for book in data.get("docs", []):
             books.append({'title':book.get('title'),'year':book.get('first_publish_year')})
-            books.sort(key=lambda x: x['year']) #order by year
+        books.sort(key=lambda x: x['year'] if x['year'] is not None else 0)  # order by year
         return { "author": author,"books": books }
+
     except requests.RequestException as e:
         return {"author": author, "error": str(e)}
 
@@ -66,8 +67,9 @@ def dashboard():
         authors = get_authors()
         selected_author = request.args.get('author')
         results = get_book_by_author(selected_author) if selected_author else None
-        return render_template("index.html", authors=authors, results=results)
+        return render_template("index.html", authors=authors, results=results, selected=selected_author)
     except Exception as e:
+        print("ERROR", e)
         return jsonify({"error": str(e)}), 500
 
 @app.route('/add', methods=['POST'])
@@ -114,6 +116,27 @@ def ready():
             'Status': 'Unready',
             'Error': str(e)
         }), 500
+
+
+@app.route('/status')
+def status():
+    uptime = round(time.time() - START_TIME, 2)
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT COUNT(*) FROM authors;")
+                author_count = cur.fetchone()[0]
+        db_status = f"connected({{author_count}})"
+    except Exception:
+        db_status = "Database unavailable"
+    return jsonify({
+        "service" :"DeployHub Author Service",
+        "uptime_seconds": uptime,
+        "database": db_status,
+        "Open Library API configured": OPENLIBRARY_URL is not None,
+        "environment": os.getenv("ENVIRONMENT", "development")
+    })
+
 
 
 
