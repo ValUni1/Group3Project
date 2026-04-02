@@ -2,6 +2,8 @@ import os
 import requests
 import psycopg2
 import time
+import retry_reloaded
+from retry_reloaded import retry, FixedBackOff
 from flask import Flask, render_template, request, jsonify,flash, redirect, url_for
 from dotenv import load_dotenv
 
@@ -38,7 +40,7 @@ def add_author(author):
 #API
 def get_book_by_author(author):
     try:
-        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=5)
+        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=500)
         data = r.json()
         if r.status_code != 200:
             return {"author": author, "error": data}
