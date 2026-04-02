@@ -13,6 +13,16 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 OPENLIBRARY_URL = os.getenv("API")
 START_TIME = time.time()
 
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_API():
+    response = requests.get(OPENLIBRARY_URL)
+    response.raise_for_status()
+    return response.json()
+
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
+def retry_database():
+    conn = get_conn()
+
 # DB connection helper
 def get_conn():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
