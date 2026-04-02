@@ -54,7 +54,7 @@ def dashboard():
         authors = get_authors()
         selected_author = request.args.get('author')
         results = get_book_by_author(selected_author) if selected_author else None
-        return render_template("index.html", authors=authors, results=results)
+        return render_template("index.html", authors=authors, results=results, selected=selected_author)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
