@@ -12,7 +12,7 @@
 - The system combines internal database data with external API data to produce a unified response. 
 - Environment variables are used to manage configuration such as database credentials and API settings, supporting secure deployment. 
 - error handling is implemented to manage failed API requests and database issues. 
-- The /health /status and /ready endpoints are included to monitor application status and verify the connection to the database. 
+- The /health /status and /ready endpoints are included to monitor application status and verify the connection to the database.  
 
 ### Branching Model:
 - We decided to employ a simple approach in regards to our branching model. We employed Trunk Based Development (GeeksforGeeks, 2026) branching strategy with master as the main branch. For each major feature we would create a new branch with a suitable name and code the new feature there. For example, when creating the health code we created a new branch called /health and coded the health route there. 
