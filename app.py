@@ -15,17 +15,8 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 OPENLIBRARY_URL = "https://openlibrary.org/search.json"
 START_TIME = time.time()
 
-@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
-def retry_API():
-    response = requests.get(OPENLIBRARY_URL)
-    response.raise_for_status()
-    return response.json()
-
-@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
-def retry_database():
-    conn = get_conn()
-
 # DB connection helper
+@retry((psycopg2.OperationalError,), max_retries=3, backoff=FixedBackOff(base_delay=1))
 def get_conn():
     return psycopg2.connect(DATABASE_URL, sslmode="require")
 
@@ -44,13 +35,15 @@ def add_author(author):
                 cur.execute("INSERT INTO authors (name) VALUES (%s);", (author,))
                 conn.commit()
         except Exception as e:
-            str(e)
+            print(f"Error adding author: {e}")
+            raise
 
 
 #API
+@retry((requests.exceptions.RequestException,), max_retries=3, backoff=FixedBackOff(base_delay=1))
 def get_book_by_author(author):
-    try:
-        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=500)
+        r= requests.get(OPENLIBRARY_URL,params={"author":author, "limit":8}, timeout=250)
+        r.raise_for_status()
         data = r.json()
         if r.status_code != 200:
             return {"author": author, "error": data}
@@ -59,9 +52,6 @@ def get_book_by_author(author):
             books.append({'title':book.get('title'),'year':book.get('first_publish_year')})
         books.sort(key=lambda x: x['year'] if x['year'] is not None else 0)  # order by year
         return { "author": author,"books": books }
-
-    except requests.RequestException as e:
-        return {"author": author, "error": str(e)}
 
 @app.route('/')
 def dashboard():
@@ -99,6 +89,11 @@ def author_books():
         return jsonify(results)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    except requests.RequestException as e:
+        return jsonify({"External API unavailable :": str(e)}), 500
+    except psycopg2.OperationalError as e:
+        return jsonify({"Database unavailable :": str(e)}), 500
+
 
 @app.route('/health')
 def health():
@@ -128,7 +123,7 @@ def status():
             with conn.cursor() as cur:
                 cur.execute("SELECT COUNT(*) FROM authors;")
                 author_count = cur.fetchone()[0]
-        db_status = f"connected({{author_count}})"
+        db_status = f"connected({author_count})"
     except Exception:
         db_status = "Database unavailable"
     return jsonify({
