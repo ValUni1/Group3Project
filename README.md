@@ -8,9 +8,6 @@ This application is containerised using Docker and deployed via Render.
 ### Github repository URL:
 https://github.com/ValUni1/Group3Project.git
 
-### Github Zipped repository:
-
-
 ### Live Application URL:
 https://group3project-0mpb.onrender.com
 
