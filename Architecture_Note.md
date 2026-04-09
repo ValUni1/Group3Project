@@ -1,7 +1,18 @@
 ### Context Diagram:
-- Con
+![img_1.png](img_1.png)
+- The central system is a web application that handles user requests and coordinates data between internal and external services. 
+- The user interacts with the system through HTTP requests like viewing authors, adding authors and retrieving book data and receives JSON responses. 
+- The application communicates with PostgreSQL database to store and retrieve author information using SQL queries. 
+- The application integrates with the Open Library API to fetch book data for selected authors via HTTP requests.
+
 ### Integration Points:
-- con
+- The application integrates with a PostgreSQL database to store and retrieve author data using SQL queries for insertion and selection. 
+- The application integrates with the Open Library API by sending requests with author parameters and receiving JSON responses containing book data.
+- Retrieved API data is processed within the application, extracting relevant fields and sorting results before returning them to the user.
+- The system combines internal database data with external API data to produce a unified response. 
+- Environment variables are used to manage configuration such as database credentials and API settings, supporting secure deployment. 
+- error handling is implemented to manage failed API requests and database issues. 
+- The /health /status and /ready endpoints are included to monitor application status and verify the connection to the database. 
 
 ### Branching Model:
 - We decided to employ a simple approach in regards to our branching model. We employed Trunk Based Development (GeeksforGeeks, 2026) branching strategy with master as the main branch. For each major feature we would create a new branch with a suitable name and code the new feature there. For example, when creating the health code we created a new branch called /health and coded the health route there. 
