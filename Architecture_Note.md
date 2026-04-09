@@ -1,5 +1,5 @@
 ### Context Diagram:
-![img_1.png](img_1.png)
+![img.png](img.png)
 - The central system is a web application that handles user requests and coordinates data between internal and external services. 
 - The user interacts with the system through HTTP requests like viewing authors, adding authors and retrieving book data and receives JSON responses. 
 - The application communicates with PostgreSQL database to store and retrieve author information using SQL queries. 
