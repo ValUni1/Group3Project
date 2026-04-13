@@ -1,3 +1,7 @@
+## Group 3 Programming Project
+- Clodagh Bríd Rochford Student Number: 124406054
+- Sarah Ellen Murphy Student Number: 124504963
+- Valeria Antocica Student Number: 119368663
 ## Application Description:
 This Flask application that allows users to
 1) Add authors to a Supabase Database
